@@ -60,7 +60,7 @@ library CompactTypes {
             // add two byte flag and create little endian encoding
             return abi.encodePacked(ScaleCodec.reverse16(uint16(((value << 2) + 1))));
         
-        } else if (value < 2**30 - 1) {
+        } else if (value <= 2**30 - 1) {
         
             // add four byte flag and create little endian encoding
             return abi.encodePacked(ScaleCodec.reverse32(uint32((value << 2)) + 2)); 

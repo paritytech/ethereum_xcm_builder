@@ -28,7 +28,7 @@ contract XCMBuilder {
         InstructionEncoded[instructionExportMessage] = ScaleCodec.encodeU8(instructionIndexExportMessage);
     }
 
-    function createMessage(CallEncoder.Instruction instruction, uint256 value) internal view returns (bytes memory) {
+    function encodeMessage(CallEncoder.Instruction instruction, uint256 value) internal view returns (bytes memory) {
         return bytes.concat(abi.encodePacked(InstructionEncoded[instruction]), CompactTypes.encodeCompactUint(value));
     }
 
@@ -50,7 +50,7 @@ contract XCMBuilder {
         uint256 value) 
     public view returns (bytes memory) {
         bytes memory callIndexEncoded = CallEncoder.encodeCallIndex();
-        bytes memory messageEncoded = createMessage(instruction, value);
+        bytes memory messageEncoded = encodeMessage(instruction, value);
         bytes memory destination = encodeDestination(xcmVersion, parents, interiorJunctions);
         return bytes.concat(
             callIndexEncoded,
