@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.13;
 
-import "./ScaleCodec.sol";
+import "./utils/ScaleCodec.sol";
+import "./utils/Bytes.sol";
 
 library CompactTypes {
 
@@ -53,7 +54,7 @@ library CompactTypes {
         if (value <= 2**6 - 1) {
             
             // add single byte flag 
-            return abi.encodePacked(uint8(value << 2)); 
+            return abi.encodePacked(uint8(value << 2));
         
         } else if (value <= 2**14 - 1) {
         
@@ -67,9 +68,34 @@ library CompactTypes {
         
         } else {
         
-            // TODO
-            return abi.encodePacked(uint8(value << 2));
-        
+            if (value <= 2**62 - 1) {
+                
+                uint8 numBytes = getLengthBytes(value);
+                uint8 prefix = ((numBytes - 4) << 2) + 3;
+                bytes memory paddedWithZeros = abi.encodePacked(ScaleCodec.reverse64(uint64((value << 8)) + prefix));
+                bytes memory encodedValue = Bytes.removeEndingZero(paddedWithZeros);
+                return encodedValue;
+
+            } else {
+                
+                uint8 numBytes = getLengthBytes(value);
+                uint8 prefix = ((numBytes - 4) << 2) + 3;
+                bytes memory paddedWithZeros = abi.encodePacked(ScaleCodec.reverse128(uint128((value << 8)) + prefix));
+                bytes memory encodedValue = Bytes.removeEndingZero(paddedWithZeros);
+                return encodedValue;
+            
+            }
         }
+    }
+
+    function getLengthBytes(uint256 value) internal pure returns (uint8) {
+        
+        uint8 length = 0;
+        uint256 temp = value;
+        while (temp != 0) { 
+            temp >>= 8; 
+            length++; 
+        }
+        return length;
     }
 }

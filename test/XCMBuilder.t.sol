@@ -82,6 +82,13 @@ contract XCMBuilderTest is Test {
         bytes memory testValue = "\x0b\x00\x40\x7a\x10\xf3\x5a";
         bytes memory encodedValue = CompactTypes.encodeCompactUint(100000000000000);
         // TODO
-        assertEq(true, true);
+        assertEq(testValue, encodedValue);
+    }
+
+    function testGetLengthBytes() public {
+        uint256 value = 100000000000000;
+        uint8 calc_length = CompactTypes.getLengthBytes(value);
+        uint8 length = 6;
+        assertEq(length, calc_length);
     }
 }

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "./CallEncoder.sol";
-import "./ScaleCodec.sol";
+import "./utils/ScaleCodec.sol";
 import "./CompactTypes.sol";
 
 
