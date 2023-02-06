@@ -91,4 +91,30 @@ contract XCMBuilderTest is Test {
         uint8 length = 6;
         assertEq(length, calc_length);
     }
+
+    function testEncodeTransactMessage() public {
+        CallEncoder.OriginKind originKind = CallEncoder.OriginKind.SovereignAccount;
+        uint64 requiredWeightAtMost = 10000000000;
+        bytes memory transactBytes = "\x00\x08\x04\x01";
+        bytes memory testMessage = "\x06\x01\x07\x00\xe4\x0b\x54\x02\x10\x00\x08\x04\x01";
+        bytes memory encodedMessage = builder.encodeTransactMessage(
+            originKind, 
+            requiredWeightAtMost, 
+            transactBytes
+        );
+        assertEq(encodedMessage, testMessage);
+    }
+
+    function testEncodeMessage() public {
+        uint8 numMessages = 3;
+        bytes memory messagesBytes = "\x24\x09\x05\x0b\x02\x00\xa1\x0f\x01\x01\x03\x1c\xbd\x2d\x43\x53\x0a\x44\x70\x5a\xd0\x88\xaf\x31\x3e\x18\xf8\x0b\x53\xef\x16\xb3\x61\x77\xcd\x4b\x77\xb8\x46\xf2\xa5\xf0\x7c\x06\x01\x07\x00\xe4\x0b\x54\x02\x10\x00\x08\x04\x01";
+        uint256 parachainId = 1000;
+        bytes memory testMessage = "\x01\x02\x09\x06\x00\xa1\x0f\x03\x0c\x24\x09\x05\x0b\x02\x00\xa1\x0f\x01\x01\x03\x1c\xbd\x2d\x43\x53\x0a\x44\x70\x5a\xd0\x88\xaf\x31\x3e\x18\xf8\x0b\x53\xef\x16\xb3\x61\x77\xcd\x4b\x77\xb8\x46\xf2\xa5\xf0\x7c\x06\x01\x07\x00\xe4\x0b\x54\x02\x10\x00\x08\x04\x01";
+        bytes memory encodedMessage = builder.createXcm(
+            numMessages, 
+            messagesBytes, 
+            parachainId
+        );
+        assertEq(encodedMessage, testMessage);
+    }
 }
