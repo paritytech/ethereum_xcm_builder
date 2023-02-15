@@ -88,6 +88,8 @@ library CompactTypes {
         }
     }
 
+    // TODO: add compact encoding of vector
+
     function getLengthBytes(uint256 value) internal pure returns (uint8) {
         
         uint8 length = 0;

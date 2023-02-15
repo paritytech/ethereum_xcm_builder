@@ -51,8 +51,4 @@ library CallEncoder {
         Superuser,
         Xcm
     }
-
-    function encodeCallIndex() internal pure returns (bytes memory) {
-        return hex"1f00";
-    }
 }

@@ -19,6 +19,7 @@ contract XCMBuilder {
     CallEncoder.XcmV3Instruction instructionExportMessage = CallEncoder.XcmV3Instruction.ExportMessage;
 
     // the indices of instructions in the PolkadotXcm pallet of BridgeHub's runtime
+    // TODO: onlyOwner can update these values 
     uint8 instructionIndexTransact = 6;
     uint8 instructionIndexDescendOrigin = 11;
     uint8 instructionIndexTrap = 25;
@@ -68,7 +69,7 @@ contract XCMBuilder {
     }
 
     // Current inputs should be the following: 
-    // originKind: 1
+    // originKind: 1 (for SovereignAccount)
     // requiredWeightAtMost:
     //     refTime: 1000000000
     //     proofSize: 10
@@ -84,12 +85,12 @@ contract XCMBuilder {
         return bytes.concat(
             abi.encodePacked(
                 InstructionEncoded[instructionTransact],
-                originKind
-            ), 
-            CompactTypes.encodeCompactUint(refTime),
-            CompactTypes.encodeCompactUint(proofSize),
-            CompactTypes.encodeCompactUint(lengthBytes),
-            transactBytes
+                originKind,
+                CompactTypes.encodeCompactUint(refTime),
+                CompactTypes.encodeCompactUint(proofSize),
+                CompactTypes.encodeCompactUint(lengthBytes),
+                transactBytes
+            )
         );
     }
 
@@ -141,12 +142,14 @@ contract XCMBuilder {
             transactBytes
         );
         return bytes.concat(
+            abi.encodePacked(
             destination,
             messageVersion,
             CompactTypes.encodeCompactUint(numMessages),
             universalOriginMessage,
             descendOriginMessage,
             transactMessage
+            )
         );
     }
 
