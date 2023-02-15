@@ -19,17 +19,17 @@ git submodule update --init --recursive
 forge install
 ```
 
-## Build the project
+### Build the project
 ```sh
 forge build
 ```
 
-## Format code
+### Format code
 ```sh
 forge fmt
 ```
 
-## Run tests
+### Run tests
 ```sh
 forge test
 ```
@@ -42,13 +42,13 @@ At first, run a single local node with *anvil* using a script:
 ./node.sh
 ```
 
-### Deploy smart contract
+### Deploy smart contracts
 To deploy the set of smart contracts, use dedicated shell script:
 ```sh
 ./deploy.sh
 ```
 
-### Spinning up the infrastructure 
+## Spinning up the infrastructure 
 
 It is possible to test messages in the directions:
 
@@ -58,9 +58,9 @@ It is possible to test messages in the directions:
 with the infrastructure described in the [bridge-infra repository](https://github.com/paritytech/bridge-infra).
 
 
-### Creating an XCM message that is executed at the BridgeHub
+## Creating an XCM message that is executed at the BridgeHub
 
-## Make a cast call to XCMBuilder.sol 
+### Make a cast call to XCMBuilder.sol 
 
 The input parameters to `createXcm`:
 ```
@@ -115,6 +115,6 @@ f39fd6e51aad88f6f4ce6ab8827279cfffb92266 (id `[u8;20]`) (address is specific to 
 00070401 (bytes on Westmint for `system.remarkWithEvent` call)
 ```
 
-### Testing the XCM with the bridge infra
+## Testing the XCM with the bridge infra
 
 This ouput can be pasted into `bridgeWococoMessages` pallet's extrinsic `executeEncodedMessage`. The bytes inside `Transact` will be executed on the parachain with ID 1000 (in our case, Westmint). The event will be emitted and visible in the explorer. 
