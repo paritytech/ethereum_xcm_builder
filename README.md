@@ -86,6 +86,7 @@ The output should be
 
 Message dissected:
 
+```
 0x
 01 (parents Here `u8`)
 02 (X2 `XcmV3Junctions`)
@@ -112,6 +113,7 @@ f39fd6e51aad88f6f4ce6ab8827279cfffb92266 (id `[u8;20]`) (address is specific to 
 28 (proofsize 10 `Compact<u64>`)
 10 (length of following bytes 4 `Compact<u64>`)
 00070401 (bytes on Westmint for `system.remarkWithEvent` call)
+```
 
 ### Testing the XCM with the bridge infra
 
