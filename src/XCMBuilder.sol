@@ -12,20 +12,20 @@ contract XCMBuilder {
 
     bytes public messageVersion = hex"03";
 
+    CallEncoder.XcmV3Instruction instructionTransact = CallEncoder.XcmV3Instruction.Transact;
+    CallEncoder.XcmV3Instruction instructionDescendOrigin = CallEncoder.XcmV3Instruction.DescendOrigin;
+    CallEncoder.XcmV3Instruction instructionTrap = CallEncoder.XcmV3Instruction.Trap;
+    CallEncoder.XcmV3Instruction instructionUniversalOrigin = CallEncoder.XcmV3Instruction.UniversalOrigin;
+    CallEncoder.XcmV3Instruction instructionExportMessage = CallEncoder.XcmV3Instruction.ExportMessage;
+
+    // the indices of instructions in the PolkadotXcm pallet of BridgeHub's runtime
+    uint8 instructionIndexTransact = 6;
+    uint8 instructionIndexDescendOrigin = 11;
+    uint8 instructionIndexTrap = 25;
+    uint8 instructionIndexUniversalOrigin = 37;
+    uint8 instructionIndexExportMessage = 38;
+
     constructor () {
-
-        CallEncoder.XcmV3Instruction instructionTransact = CallEncoder.XcmV3Instruction.Transact;
-        CallEncoder.XcmV3Instruction instructionDescendOrigin = CallEncoder.XcmV3Instruction.DescendOrigin;
-        CallEncoder.XcmV3Instruction instructionTrap = CallEncoder.XcmV3Instruction.Trap;
-        CallEncoder.XcmV3Instruction instructionUniversalOrigin = CallEncoder.XcmV3Instruction.UniversalOrigin;
-        CallEncoder.XcmV3Instruction instructionExportMessage = CallEncoder.XcmV3Instruction.ExportMessage;
-
-        // the indices of instructions in the PolkadotXcm pallet of BridgeHub's runtime
-        uint8 instructionIndexTransact = 6;
-        uint8 instructionIndexDescendOrigin = 11;
-        uint8 instructionIndexTrap = 23;
-        uint8 instructionIndexUniversalOrigin = 34;
-        uint8 instructionIndexExportMessage = 35;
 
         InstructionEncoded[instructionTransact] = ScaleCodec.encodeU8(instructionIndexTransact);
         InstructionEncoded[instructionDescendOrigin] = ScaleCodec.encodeU8(instructionIndexDescendOrigin);
@@ -34,27 +34,66 @@ contract XCMBuilder {
         InstructionEncoded[instructionExportMessage] = ScaleCodec.encodeU8(instructionIndexExportMessage);
     }
 
+    // the global consensus parameters can be made generic for messages
+    // coming from other consensus environments 
+    function encodeUniversalOrigin() public view returns (bytes memory) {
+        // uint256 chainId = block.chainid; // Ethereum mainnet ChainID 1
+        uint256 chainId = 5;
+        bytes memory globalConsensusEthereum = hex"0907";
+        return bytes.concat(
+            abi.encodePacked(
+                InstructionEncoded[instructionUniversalOrigin],
+                globalConsensusEthereum,
+                CompactTypes.encodeCompactUint(chainId)
+            )
+        );
+    }
+
+    function encodeDescendOrigin() internal view returns (bytes memory) {
+        CallEncoder.XcmV3Junctions interiorJunctions = CallEncoder.XcmV3Junctions.X1; 
+        CallEncoder.XcmV3Junction junction = CallEncoder.XcmV3Junction.AccountKey20; 
+        CallEncoder.XcmV3JunctionNetworkId network = CallEncoder.XcmV3JunctionNetworkId.Ethereum;
+        uint256 chainId = 5;
+        return bytes.concat(
+            abi.encodePacked(
+                InstructionEncoded[instructionDescendOrigin],
+                ScaleCodec.encodeU8(uint8(interiorJunctions)),
+                ScaleCodec.encodeU8(uint8(junction)),
+                hex"01", // TODO add encoding of Option Some
+                ScaleCodec.encodeU8(uint8(network)),
+                CompactTypes.encodeCompactUint(chainId),
+                msg.sender
+            )
+        );
+    }
+
     // Current inputs should be the following: 
     // originKind: 1
-    // requiredWeightAtMost: 10000000000
-    // transactBytes: 0x00080401
+    // requiredWeightAtMost:
+    //     refTime: 1000000000
+    //     proofSize: 10
+    // transactBytes: 0x00070401 (test extrinsic `system.remarkWithEvent`)
     function encodeTransactMessage(
         CallEncoder.OriginKind originKind,
-        uint64 requiredWeightAtMost,
+        uint64 refTime,
+        uint64 proofSize,
         bytes memory transactBytes 
     ) 
     public view returns (bytes memory) {
         uint256 lengthBytes = transactBytes.length;
         return bytes.concat(
             abi.encodePacked(
-                InstructionEncoded[CallEncoder.XcmV3Instruction.Transact],
+                InstructionEncoded[instructionTransact],
                 originKind
             ), 
-            CompactTypes.encodeCompactUint(requiredWeightAtMost),
+            CompactTypes.encodeCompactUint(refTime),
+            CompactTypes.encodeCompactUint(proofSize),
             CompactTypes.encodeCompactUint(lengthBytes),
             transactBytes
         );
     }
+
+
     
     // Current inputs should be the following: 
     // parachainId: 1000
@@ -78,21 +117,36 @@ contract XCMBuilder {
     }
 
     // Current inputs should be the following: 
-    // numMessages: 3
-    // messagesBytes: 0x2409050b0200a10f0101031cbd2d43530a44705ad088af313e18f80b53ef16b36177cd4b77b846f2a5f07c06010700e40b54021000080401
     // parachainId: 1000
+    // originKind: 1 (SovereignAccount)
+    // refTime: 1000000000
+    // proofSize: 10
+    // transactBytes: 0x00070401 (system.remarkWithEvent)
     function createXcm(
-        uint8 numMessages,
-        bytes memory messagesBytes,
-        uint256 parachainId 
+        uint256 parachainId,
+        CallEncoder.OriginKind originKind,
+        uint64 refTime,
+        uint64 proofSize,
+        bytes memory transactBytes 
     ) 
     public view returns (bytes memory) {
         bytes memory destination = encodeDestination(parachainId);
+        uint8 numMessages = 3; // currently testing UniversalOrigin, DescendOrigin, Transact
+        bytes memory universalOriginMessage = encodeUniversalOrigin();
+        bytes memory descendOriginMessage = encodeDescendOrigin();
+        bytes memory transactMessage = encodeTransactMessage(
+            originKind, 
+            refTime, 
+            proofSize, 
+            transactBytes
+        );
         return bytes.concat(
             destination,
             messageVersion,
             CompactTypes.encodeCompactUint(numMessages),
-            messagesBytes
+            universalOriginMessage,
+            descendOriginMessage,
+            transactMessage
         );
     }
 

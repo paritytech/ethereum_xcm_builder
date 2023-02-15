@@ -40,8 +40,7 @@ library CallEncoder {
         Westend, 
         Rococo,
         Wococo,
-        EthereumFoundation, 
-        EthereumClassic,
+        Ethereum,
         BitcoinCore, 
         BitcoinCash
     }
