@@ -118,3 +118,26 @@ f39fd6e51aad88f6f4ce6ab8827279cfffb92266 (id `[u8;20]`) (address is specific to 
 ## Testing the XCM with the bridge infra
 
 This ouput can be pasted into `bridgeWococoMessages` pallet's extrinsic `executeEncodedMessage`. The bytes inside `Transact` will be executed on the parachain with ID 1000 (in our case, Westmint). The event will be emitted and visible in the explorer. 
+
+### Testing balance transfers with bridge infra 
+
+
+### Prefund Alice's proxy account 
+
+Alice's proxy account is her hashed MultiLocation on Ethereum. A quick way to get her account:
+
+Call on BridgeHub:
+`0x0102090600a10f030c250907140b0103010714f39fd6e51aad88f6f4ce6ab8827279cfffb92266060102286bee2818450201000000` `(playground.doSomethingAsSigned(1))`
+
+Find Alice's proxy address on Westmint in `playground.TriggeredSigned` event:
+5GZuzM4A64eonSJ1EWaQRDehJreCfXGSiMo3gZ3sdMoxwhcQ
+
+This account needs to prefunded before Alice can transfer balances.
+
+`balances.transfer(dest, amount)` with parameters Alice and 0.5
+length of message: `a4` (18 bytes)
+`a40a0000d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d070088526a74`
+
+Message that Alice can send from BridgeHub to successfuly move funds from her proxy address:
+
+`0x0102090600a10f030c250907140b0103010714f39fd6e51aad88f6f4ce6ab8827279cfffb92266060102286bee28a40a0000d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d070088526a74`
