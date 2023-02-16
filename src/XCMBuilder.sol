@@ -39,14 +39,12 @@ contract XCMBuilder {
     // coming from other consensus environments 
     function encodeUniversalOrigin() public view returns (bytes memory) {
         // uint256 chainId = block.chainid; // Ethereum mainnet ChainID 1
-        uint256 chainId = 5;
+        uint256 chainId = 5; // Ethereum goerli testnet ChainID 5
         bytes memory globalConsensusEthereum = hex"0907";
-        return bytes.concat(
-            abi.encodePacked(
-                InstructionEncoded[instructionUniversalOrigin],
-                globalConsensusEthereum,
-                CompactTypes.encodeCompactUint(chainId)
-            )
+        return abi.encodePacked(
+            InstructionEncoded[instructionUniversalOrigin],
+            globalConsensusEthereum,
+            CompactTypes.encodeCompactUint(chainId)
         );
     }
 
@@ -55,16 +53,14 @@ contract XCMBuilder {
         CallEncoder.XcmV3Junction junction = CallEncoder.XcmV3Junction.AccountKey20; 
         CallEncoder.XcmV3JunctionNetworkId network = CallEncoder.XcmV3JunctionNetworkId.Ethereum;
         uint256 chainId = 5;
-        return bytes.concat(
-            abi.encodePacked(
-                InstructionEncoded[instructionDescendOrigin],
-                ScaleCodec.encodeU8(uint8(interiorJunctions)),
-                ScaleCodec.encodeU8(uint8(junction)),
-                hex"01", // TODO add encoding of Option Some
-                ScaleCodec.encodeU8(uint8(network)),
-                CompactTypes.encodeCompactUint(chainId),
-                msg.sender
-            )
+        return abi.encodePacked(
+            InstructionEncoded[instructionDescendOrigin],
+            ScaleCodec.encodeU8(uint8(interiorJunctions)),
+            ScaleCodec.encodeU8(uint8(junction)),
+            hex"01", // TODO add encoding of Option Some
+            ScaleCodec.encodeU8(uint8(network)),
+            CompactTypes.encodeCompactUint(chainId),
+            msg.sender
         );
     }
 
@@ -82,15 +78,13 @@ contract XCMBuilder {
     ) 
     public view returns (bytes memory) {
         uint256 lengthBytes = transactBytes.length;
-        return bytes.concat(
-            abi.encodePacked(
-                InstructionEncoded[instructionTransact],
-                originKind,
-                CompactTypes.encodeCompactUint(refTime),
-                CompactTypes.encodeCompactUint(proofSize),
-                CompactTypes.encodeCompactUint(lengthBytes),
-                transactBytes
-            )
+        return abi.encodePacked(
+            InstructionEncoded[instructionTransact],
+            originKind,
+            CompactTypes.encodeCompactUint(refTime),
+            CompactTypes.encodeCompactUint(proofSize),
+            CompactTypes.encodeCompactUint(lengthBytes),
+            transactBytes
         );
     }
 
@@ -141,15 +135,13 @@ contract XCMBuilder {
             proofSize, 
             transactBytes
         );
-        return bytes.concat(
-            abi.encodePacked(
+        return abi.encodePacked(
             destination,
             messageVersion,
             CompactTypes.encodeCompactUint(numMessages),
             universalOriginMessage,
             descendOriginMessage,
             transactMessage
-            )
         );
     }
 
