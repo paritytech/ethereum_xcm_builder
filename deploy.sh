@@ -1,4 +1,4 @@
- # exit when any command fails
+# exit when any command fails
 set -e
 
 NODE_RPC_URL="http://127.0.0.1:8545"
@@ -10,7 +10,10 @@ COMPACTTYPES="CompactTypes"
 CALLENCODER="CallEncoder"
 XCMBUILDER="XCMBuilder"
 
-
+UTILS_FOLDER="utils"
+DEMO_FOLDER="demo"
+TOKEN="BridgesTaskForceToken"
+DEMO="Demo"
 
 deploy () {
     contract=$1
@@ -21,9 +24,6 @@ deploy () {
     echo "------------------------------------------------------------------------------------\n"
 }
 
-deploy "src/utils/${MEMORY}.sol:${MEMORY}"
-deploy "src/utils/${BYTES}.sol:${BYTES}"
-deploy "src/utils/${SCALECODEC}.sol:${SCALECODEC}"
-deploy "src/${COMPACTTYPES}.sol:${COMPACTTYPES}"
-deploy "src/${CALLENCODER}.sol:${CALLENCODER}"
-deploy "src/${XCMBUILDER}.sol:${XCMBUILDER}"
+# Demo stuff
+deploy "src/${DEMO_FOLDER}/${TOKEN}.sol:${TOKEN}"
+deploy "src/${DEMO_FOLDER}/${DEMO}.sol:${DEMO}"

@@ -34,9 +34,8 @@ contract XCMBuilder {
 
     // the global consensus parameters can be made generic for messages
     // coming from other consensus environments
-    function encodeUniversalOrigin() public view returns (bytes memory) {
+    function encodeUniversalOrigin(uint256 chainId) public view returns (bytes memory) {
         // uint256 chainId = block.chainid; // Ethereum mainnet ChainID 1
-        uint256 chainId = 5; // Ethereum goerli testnet ChainID 5
         bytes memory globalConsensusEthereum = hex"0907";
         return abi.encodePacked(
             InstructionEncoded[instructionUniversalOrigin],
@@ -45,11 +44,10 @@ contract XCMBuilder {
         );
     }
 
-    function encodeDescendOrigin() internal view returns (bytes memory) {
+    function encodeDescendOrigin(uint256 chainId) internal view returns (bytes memory) {
         CallEncoder.XcmV3Junctions interiorJunctions = CallEncoder.XcmV3Junctions.X1;
         CallEncoder.XcmV3Junction junction = CallEncoder.XcmV3Junction.AccountKey20;
         CallEncoder.XcmV3JunctionNetworkId network = CallEncoder.XcmV3JunctionNetworkId.Ethereum;
-        uint256 chainId = 5;
         return abi.encodePacked(
             InstructionEncoded[instructionDescendOrigin],
             ScaleCodec.encodeU8(uint8(interiorJunctions)),
@@ -109,6 +107,7 @@ contract XCMBuilder {
     // proofSize: 10
     // transactBytes: 0x00070401 (system.remarkWithEvent)
     function createXcm(
+        uint256 chainId,
         uint256 parachainId,
         CallEncoder.OriginKind originKind,
         uint64 refTime,
@@ -119,8 +118,8 @@ contract XCMBuilder {
     ) public view returns (bytes memory) {
         bytes memory destination = encodeDestination(parachainId);
         uint8 numMessages = 2; // UniversalOrigin, DescendOrigin
-        bytes memory universalOriginMessage = encodeUniversalOrigin();
-        bytes memory descendOriginMessage = encodeDescendOrigin();
+        bytes memory universalOriginMessage = encodeUniversalOrigin(chainId);
+        bytes memory descendOriginMessage = encodeDescendOrigin(chainId);
         bytes memory transactMessages = "";
 
         if (transactBytes1.length > 0) {
