@@ -2,7 +2,6 @@
 pragma solidity ^0.8.13;
 
 library CallEncoder {
-    
     // Currently using a limited number of instructions used with BridgeHub
     enum XcmV3Instruction {
         ExportMessage,
@@ -13,40 +12,40 @@ library CallEncoder {
     }
 
     enum XcmV3Junction {
-        Parachain, 
+        Parachain,
         AccountId32,
-        AccountIndex64, 
+        AccountIndex64,
         AccountKey20,
-        PalletInstance, 
+        PalletInstance,
         GeneralIndex,
         GeneralKey,
-        OnlyChild, 
+        OnlyChild,
         Plurality,
         GlobalConsensus
     }
 
     // Currently using only up to X2 level Junctions
     enum XcmV3Junctions {
-        Here, 
-        X1, 
+        Here,
+        X1,
         X2
     }
 
     enum XcmV3JunctionNetworkId {
         ByGenesis,
         ByFork,
-        Polkadot, 
-        Kusama, 
-        Westend, 
+        Polkadot,
+        Kusama,
+        Westend,
         Rococo,
         Wococo,
         Ethereum,
-        BitcoinCore, 
+        BitcoinCore,
         BitcoinCash
     }
 
     enum OriginKind {
-        Native, 
+        Native,
         SovereignAccount,
         Superuser,
         Xcm
