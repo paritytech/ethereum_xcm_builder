@@ -107,13 +107,16 @@ contract XCMBuilderTest is Test {
         assertEq(encodedMessage, testMessage);
     }
 
+    // TODO: change test to new message batch  
     function testEncodeMessage() public {
         address addr = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
         vm.prank(addr);
         CallEncoder.OriginKind originKind = CallEncoder.OriginKind.SovereignAccount;
         uint64 refTime = 1000000000;
         uint64 proofSize= 10;
-        bytes memory transactBytes = "\x00\x07\x04\x01";
+        bytes memory transactBytes1 = "\x00\x07\x04\x01";
+        bytes memory transactBytes2 = "\x00\x07\x04\x01"; // TODO edit bytes
+        bytes memory transactBytes3 = "\x00\x07\x04\x01"; // TODO edit bytes
         uint256 parachainId = 1000;
         bytes memory testMessage = "\x01\x02\x09\x06\x00\xa1\x0f\x03\x0c\x25\x09\x07\x14\x0b\x01\x03\x01\x07\x14\xf3\x9f\xd6\xe5\x1a\xad\x88\xf6\xf4\xce\x6a\xb8\x82\x72\x79\xcf\xff\xb9\x22\x66\x06\x01\x02\x28\x6b\xee\x28\x10\x00\x07\x04\x01";
         bytes memory encodedMessage = builder.createXcm(
@@ -121,7 +124,9 @@ contract XCMBuilderTest is Test {
             originKind,
             refTime,
             proofSize,
-            transactBytes 
+            transactBytes1, 
+            transactBytes2,
+            transactBytes3
         );
         assertEq(encodedMessage, testMessage);
     }

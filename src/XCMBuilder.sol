@@ -122,26 +122,59 @@ contract XCMBuilder {
         CallEncoder.OriginKind originKind,
         uint64 refTime,
         uint64 proofSize,
-        bytes memory transactBytes 
+        bytes memory transactBytes1,
+        bytes memory transactBytes2,
+        bytes memory transactBytes3
     ) 
     public view returns (bytes memory) {
         bytes memory destination = encodeDestination(parachainId);
-        uint8 numMessages = 3; // currently testing UniversalOrigin, DescendOrigin, Transact
+        uint8 numMessages = 2; // UniversalOrigin, DescendOrigin 
         bytes memory universalOriginMessage = encodeUniversalOrigin();
         bytes memory descendOriginMessage = encodeDescendOrigin();
-        bytes memory transactMessage = encodeTransactMessage(
-            originKind, 
-            refTime, 
-            proofSize, 
-            transactBytes
-        );
+        bytes memory transactMessages = "";
+        
+        if (transactBytes1.length > 0) {
+            numMessages += 1;
+            bytes memory transactMessage1 = encodeTransactMessage(
+                originKind, 
+                refTime, 
+                proofSize, 
+                transactBytes1
+            );
+            bytes memory transactMessages = transactMessage1;
+        } else {
+            return transactMessages;
+        }
+
+        if (transactBytes2.length > 0) {
+            numMessages += 1;
+            bytes memory transactMessage2 = encodeTransactMessage(
+                originKind, 
+                refTime, 
+                proofSize, 
+                transactBytes2
+            );
+            transactMessages = abi.encodePacked(transactMessages, transactMessage2);
+        }
+
+        if (transactBytes3.length > 0) {
+            numMessages += 1;
+            bytes memory transactMessage3 = encodeTransactMessage(
+                originKind, 
+                refTime, 
+                proofSize, 
+                transactBytes3
+            );
+            transactMessages = abi.encodePacked(transactMessages, transactMessage3);
+        }
+
         return abi.encodePacked(
             destination,
             messageVersion,
             CompactTypes.encodeCompactUint(numMessages),
             universalOriginMessage,
             descendOriginMessage,
-            transactMessage
+            transactMessages
         );
     }
 
