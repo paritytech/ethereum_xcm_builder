@@ -141,10 +141,8 @@ contract XCMBuilder {
                 proofSize, 
                 transactBytes1
             );
-            bytes memory transactMessages = transactMessage1;
-        } else {
-            return transactMessages;
-        }
+            transactMessages = abi.encodePacked(transactMessages, transactMessage1);
+        } 
 
         if (transactBytes2.length > 0) {
             numMessages += 1;
