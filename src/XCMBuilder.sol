@@ -44,7 +44,7 @@ contract XCMBuilder {
         );
     }
 
-    function encodeDescendOrigin(uint256 chainId) internal view returns (bytes memory) {
+    function encodeDescendOrigin(uint256 chainId, address sender) internal view returns (bytes memory) {
         CallEncoder.XcmV3Junctions interiorJunctions = CallEncoder.XcmV3Junctions.X1;
         CallEncoder.XcmV3Junction junction = CallEncoder.XcmV3Junction.AccountKey20;
         CallEncoder.XcmV3JunctionNetworkId network = CallEncoder.XcmV3JunctionNetworkId.Ethereum;
@@ -55,7 +55,7 @@ contract XCMBuilder {
             hex"01", // TODO add encoding of Option Some
             ScaleCodec.encodeU8(uint8(network)),
             CompactTypes.encodeCompactUint(chainId),
-            msg.sender
+            sender
         );
     }
 
@@ -108,6 +108,7 @@ contract XCMBuilder {
     // transactBytes: 0x00070401 (system.remarkWithEvent)
     function createXcm(
         uint256 chainId,
+        address sender,
         uint256 parachainId,
         CallEncoder.OriginKind originKind,
         uint64 refTime,
@@ -119,7 +120,7 @@ contract XCMBuilder {
         bytes memory destination = encodeDestination(parachainId);
         uint8 numMessages = 2; // UniversalOrigin, DescendOrigin
         bytes memory universalOriginMessage = encodeUniversalOrigin(chainId);
-        bytes memory descendOriginMessage = encodeDescendOrigin(chainId);
+        bytes memory descendOriginMessage = encodeDescendOrigin(chainId, sender);
         bytes memory transactMessages = "";
 
         if (transactBytes1.length > 0) {
